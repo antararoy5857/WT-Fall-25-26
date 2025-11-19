@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Product Review System — Example</title>
+<style>
+  /* Basic, clean, human-written styles */
+  :root{
+    --bg:#f6f8fb;
+    --card:#fff;
+    --muted:#6b7280;
+    --accent:#1f6feb;
+    --danger:#d9534f;
+    --success:#198754;
+    --shadow: 0 6px 20px rgba(14,20,30,0.06);
+    --radius:12px;
+  }
+  body{
+    font-family: "Segoe UI", Roboto, Arial, sans-serif;
+    background:var(--bg);
+    margin:0;
+    padding:28px;
+    color:#111827;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  .container{
+    max-width:1100px;
+    margin:0 auto;
+  }
+
+  header{
+    text-align:center;
+    margin-bottom:22px;
+  }
+  header h1{ margin:6px 0; font-size:24px; }
+  header p{ margin:0; color:var(--muted); }
+
+  /* Main grid */
+  .grid{
+    display:grid;
+    grid-template-columns: 420px 1fr;
+    gap:20px;
+    align-items:start;
+  }
+
+  @media (max-width:920px){
+    .grid{ grid-template-columns: 1fr; }
+  }
+
+  /* Card */
+  .card{
+    background:var(--card);
+    border-radius:var(--radius);
+    padding:16px;
+    box-shadow:var(--shadow);
+    border:1px solid rgba(16,24,40,0.04);
+  }
+
+  /* Form */
+  form .row{ margin-bottom:12px; }
+  label{ display:block; font-weight:600; margin-bottom:6px; font-size:14px; }
+  input[type="text"], input[type="email"], textarea, .rating-stars, select {
+    width:100%;
+    box-sizing:border-box;
+    padding:10px 12px;
+    border-radius:8px;
+    border:1px solid #e6e9ee;
+    font-size:14px;
+    outline:none;
+  }
+  input[type="text"]:focus, input[type="email"]:focus, textarea:focus {
+    border-color:var(--accent);
+    box-shadow:0 6px 18px rgba(31,111,235,0.06);
+  }
+  textarea{ min-height:110px; resize:vertical; }
+
+  .small { font-size:13px; color:var(--muted); }
+  .error { color:var(--danger); font-size:13px; margin-top:6px; }
+
+  /* Stars */
+  .rating-stars {
+    display:flex;
+    gap:6px;
+    align-items:center;
+    padding:6px 0;
+    background:transparent;
+    border:0;
+  }
+  .rating-stars button {
+    background:transparent;
+    border:0;
+    font-size:22px;
+    cursor:pointer;
+    line-height:1;
+    padding:6px;
+    border-radius:6px;
+    color:#cbd5e1;
+    transition:color 120ms ease, transform 120ms ease;
+  }
+  .rating-stars button:hover{ transform:translateY(-3px); }
+  .rating-stars button.active{ color: #f6b042; } /* gold */
+
+  /* Recommend radios */
+  .inline { display:flex; gap:12px; align-items:center; }
+
+  .btn {
+    background:var(--accent);
+    color:#fff;
+    padding:9px 14px;
+    border-radius:10px;
+    border:0;
+    cursor:pointer;
+    font-weight:600;
+    font-size:14px;
+  }
+  .btn.secondary {
+    background:transparent;
+    border:1px solid #e6e9ee;
+    color:var(--muted);
+  }
+
+  /* Stats */
+  .stats {
+    display:flex;
+    gap:12px;
+    margin-bottom:12px;
+    flex-wrap:wrap;
+  }
+  .stat {
+    background:#fbfdff;
+    padding:10px 12px;
+    border-radius:10px;
+    border:1px solid rgba(16,24,40,0.03);
+    min-width:140px;
+  }
+  .stat strong{ display:block; font-size:18px; }
+  .stat .muted{ color:var(--muted); font-size:13px; }
+
+  /* Reviews list */
+  .controls { display:flex; gap:12px; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; }
+  .reviews { display:flex; flex-direction:column; gap:12px; }
+  .review {
+    background:#fff;
+    border-radius:10px;
+    padding:12px;
+    border:1px solid rgba(16,24,40,0.04);
+    display:flex;
+    gap:12px;
+  }
+  .avatar {
+    width:58px; height:58px; border-radius:10px; background:#eef2ff; display:flex; align-items:center; justify-content:center; font-weight:700; color:#334155;
+    flex:0 0 58px;
+  }
+  .rbody { flex:1; }
+  .rhead { display:flex; justify-content:space-between; gap:8px; align-items:center; }
+  .rtitle { font-weight:700; font-size:15px; }
+  .rmeta { color:var(--muted); font-size:13px; }
+  .rdesc { margin-top:8px; color:#0f172a; line-height:1.4; white-space:pre-wrap; }
+
+  .rfoot { margin-top:10px; display:flex; gap:12px; align-items:center; justify-content:space-between; flex-wrap:wrap; }
+  .helpful { font-size:13px; color:var(--muted); display:flex; gap:8px; align-items:center; }
+  .helpful button{ border:0; background:#f3f4f6; padding:6px 8px; border-radius:8px; cursor:pointer; }
+
+  /* small label badge */
+  .badge { background:#f1f5f9; color:var(--muted); padding:6px 8px; border-radius:10px; font-weight:600; font-size:13px; }
+
+  footer { margin-top:22px; text-align:center; color:var(--muted); font-size:13px; }
+
+</style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>Product Reviews</h1>
+      <p class="small">Share your experience. Reviews are kept in this browser session only.</p>
+    </header>
+
+    <main class="grid">
+      <!-- Left column: Form -->
+      <section class="card" aria-labelledby="formTitle">
+        <h2 id="formTitle" style="margin-top:0; font-size:18px;">Write a Review</h2>
+
+        <form id="reviewForm" novalidate>
+          <!-- Name -->
+          <div class="row">
+            <label for="name">Customer Name <span class="small" aria-hidden="true">* </span></label>
+            <input id="name" name="name" type="text" placeholder="Your name" aria-describedby="nameError" required />
+            <div id="nameError" class="error" aria-live="polite"></div>
+          </div>
+
+          <!-- Email -->
+          <div class="row">
+            <label for="email">Email (optional)</label>
+            <input id="email" name="email" type="email" placeholder="you@example.com" aria-describedby="emailError" />
+            <div id="emailError" class="error" aria-live="polite"></div>
+          </div>
+
+          <!-- Title -->
+          <div class="row">
+            <label for="title">Review Title</label>
+            <input id="title" name="title" type="text" placeholder="Short title for your review" aria-describedby="titleError" required />
+            <div id="titleError" class="error" aria-live="polite"></div>
+          </div>
+
+          <!-- Description -->
+          <div class="row">
+            <label for="description">Review Description</label>
+            <textarea id="description" name="description" placeholder="Write your review..." aria-describedby="descInfo descError" required></textarea>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px;">
+              <div id="descInfo" class="small">Min 20 characters • Max 1000</div>
+              <div id="descCounter" class="small">0 / 1000</div>
+            </div>
+            <div id="descError" class="error" aria-live="polite"></div>
+          </div>
+
+          <!-- Rating -->
+          <div class="row">
+            <label>Product Rating <span class="small">* (click a star)</span></label>
+            <div class="rating-stars" role="radiogroup" aria-labelledby="ratingLabel" id="ratingGroup">
+              <!-- Buttons populated by JS -->
+            </div>
+            <div id="ratingError" class="error" aria-live="polite"></div>
+          </div>
+
+          <!-- Recommend -->
+          <div class="row">
+            <label>Would you recommend this product?</label>
+            <div class="inline" role="radiogroup" aria-label="Recommend">
+              <label><input type="radio" name="recommend" value="yes"> Yes</label>
+              <label><input type="radio" name="recommend" value="no"> No</label>
+              <label><input type="radio" name="recommend" value="none" checked> Prefer not to say</label>
+            </div>
+            <div id="recommendInfo" class="small" style="margin-top:6px;">This is optional.</div>
+          </div>
+
+          <!-- Buttons -->
+          <div class="row" style="display:flex; gap:10px; margin-top:6px;">
+            <button type="submit" class="btn">Submit Review</button>
+            <button type="button" id="resetBtn" class="btn secondary">Reset</button>
+          </div>
+        </form>
+      </section>
+
+      <!-- Right column: Stats + Reviews -->
+      <section>
+        <div class="card" style="margin-bottom:12px;">
+          <div class="stats" aria-hidden="true">
+            <div class="stat">
+              <strong id="totalReviews">0</strong>
+              <div class="muted">Total Reviews</div>
+            </div>
+            <div class="stat">
+              <strong id="avgRating">0.0</strong>
+              <div class="muted">Average Rating</div>
+            </div>
+            <div class="stat">
+              <strong id="recPercent">0%</strong>
+              <div class="muted">Recommend Rate</div>
+            </div>
+          </div>
+
+          <div class="controls" style="margin-top:6px;">
+            <div class="small">Sort:
+              <select id="sortSelect" aria-label="Sort reviews">
+                <option value="newest">Newest first</option>
+                <option value="highest">Highest rated first</option>
+              </select>
+            </div>
+
+            <div style="display:flex; gap:8px; align-items:center;">
+              <div class="small">Show:</div>
+              <select id="filterRecommend" aria-label="Filter recommendations">
+                <option value="all">All reviews</option>
+                <option value="yes">Recommended only</option>
+                <option value="no">Not recommended</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3 style="margin-top:0; font-size:16px;">Reviews</h3>
+          <div id="reviewsList" class="reviews" aria-live="polite"></div>
+          <div id="emptyMsg" class="small" style="margin-top:12px; color:var(--muted)">No reviews yet. Be the first to write one!</div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="small">Example review system — all data kept in this session only.</div>
+    </footer>
+  </div>
+
+<script>
+/* ---------------------------
+   In-memory storage for reviews
+   Each review:
+   {
+     id, name, email, title, description,
+     rating (1-5), recommend ('yes'|'no'|'none'),
+     helpfulCount, createdAt (Date object)
+   }
+---------------------------- */
+const reviews = [];
+
+// DOM elements
+const form = document.getElementById('reviewForm');
+const nameInput = document.getElementById('name');
+const emailInput = document.getElementById('email');
+const titleInput = document.getElementById('title');
+const descInput = document.getElementById('description');
+const descCounter = document.getElementById('descCounter');
+const ratingGroup = document.getElementById('ratingGroup');
+
+const nameError = document.getElementById('nameError');
+const emailError = document.getElementById('emailError');
+const titleError = document.getElementById('titleError');
+const descError = document.getElementById('descError');
+const ratingError = document.getElementById('ratingError');
+
+const totalReviewsEl = document.getElementById('totalReviews');
+const avgRatingEl = document.getElementById('avgRating');
+const recPercentEl = document.getElementById('recPercent');
+
+const reviewsList = document.getElementById('reviewsList');
+const emptyMsg = document.getElementById('emptyMsg');
+
+const sortSelect = document.getElementById('sortSelect');
+const filterRecommend = document.getElementById('filterRecommend');
+const resetBtn = document.getElementById('resetBtn');
+
+// Rating state
+let selectedRating = 0;
+
+// Initialize stars (1-5)
+function createStars(){
+  ratingGroup.innerHTML = '';
+  for(let i=1;i<=5;i++){
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.setAttribute('aria-label', `${i} star${i>1?'s':''}`);
+    btn.setAttribute('data-value', i);
+    btn.innerHTML = '★';
+    btn.addEventListener('click', function(){
+      setRating(i);
+    });
+    ratingGroup.appendChild(btn);
+  }
+}
+createStars();
+
+// Set rating visually & state
+function setRating(value){
+  selectedRating = value;
+  const buttons = ratingGroup.querySelectorAll('button');
+  buttons.forEach(b=>{
+    const v = Number(b.getAttribute('data-value'));
+    if(v <= value) b.classList.add('active');
+    else b.classList.remove('active');
+  });
+  ratingError.textContent = '';
+}
+
+// Character counter for description
+const DESC_MIN = 20;
+const DESC_MAX = 1000;
+descInput.addEventListener('input', function(){
+  const len = descInput.value.length;
+  descCounter.textContent = `${len} / ${DESC_MAX}`;
+  if(len < DESC_MIN || len > DESC_MAX){
+    // show hint in error area, but not intrusive
+    if(len === 0) descError.textContent = '';
+    else descError.textContent = '';
+  } else {
+    descError.textContent = '';
+  }
+});
+
+// Validation functions
+function validateName(name){
+  if(!name) return "Name is required";
+  if(name.trim().length < 2 || name.trim().length > 30) return "Name should be between 2 and 30 characters";
+  return "";
+}
+
+function validateEmail(email){
+  if(!email) return ""; // optional
+  // simple email regex (good for this task)
+  const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if(!re.test(email.trim())) return "Please enter a valid email address";
+  return "";
+}
+
+function validateTitle(title){
+  if(!title) return "Review title is required";
+  const len = title.trim().length;
+  if(len < 5 || len > 100) return "Review title should be between 5 and 100 characters";
+  return "";
+}
+
+function validateDescription(desc){
+  if(!desc) return "Review description is required";
+  const len = desc.trim().length;
+  if(len < DESC_MIN || len > DESC_MAX) return `Review description should be between ${DESC_MIN} and ${DESC_MAX} characters`;
+  return "";
+}
+
+function validateRating(rating){
+  if(!rating || rating < 1 || rating > 5) return "Please select a product rating";
+  return "";
+}
+
+// Clear error messages
+function clearErrors(){
+  nameError.textContent = '';
+  emailError.textContent = '';
+  titleError.textContent = '';
+  descError.textContent = '';
+  ratingError.textContent = '';
+}
+
+// Utility for formatted date/time
+function formatDate(date){
+  // Format: YYYY-MM-DD HH:MM (24h)
+  const y = date.getFullYear();
+  const m = String(date.getMonth()+1).padStart(2,'0');
+  const d = String(date.getDate()).padStart(2,'0');
+  const hh = String(date.getHours()).padStart(2,'0');
+  const mm = String(date.getMinutes()).padStart(2,'0');
+  return `${y}-${m}-${d} ${hh}:${mm}`;
+}
+
+// Build a review object and add to reviews array
+function addReview(data){
+  const r = {
+    id: Date.now() + '-' + Math.floor(Math.random()*9999),
+    name: data.name.trim(),
+    email: data.email.trim(),
+    title: data.title.trim(),
+    description: data.description.trim(),
+    rating: data.rating,
+    recommend: data.recommend,
+    helpfulCount: 0,
+    createdAt: new Date()
+  };
+  reviews.push(r);
+  updateUI();
+}
+
+// Reusable calculation functions
+function calcTotal(){
+  return reviews.length;
+}
+function calcAvgRating(){
+  if(reviews.length === 0) return 0;
+  const sum = reviews.reduce((s,r)=> s + r.rating, 0);
+  return +(sum / reviews.length).toFixed(1);
+}
+function calcRecommendPercent(){
+  if(reviews.length === 0) return 0;
+  const yes = reviews.filter(r=> r.recommend === 'yes').length;
+  const percent = Math.round((yes / reviews.length) * 100);
+  return percent;
+}
+
+// Render stats
+function renderStats(){
+  totalReviewsEl.textContent = calcTotal();
+  avgRatingEl.textContent = calcAvgRating().toFixed(1);
+  recPercentEl.textContent = `${calcRecommendPercent()}%`;
+}
+
+// Render reviews list (with sorting & filtering)
+function renderReviews(){
+  reviewsList.innerHTML = '';
+  const sortBy = sortSelect.value;
+  const filterBy = filterRecommend.value;
+
+  // Clone array to avoid mutating original
+  let list = reviews.slice();
+
+  // Filter
+  if(filterBy === 'yes') list = list.filter(r=> r.recommend === 'yes');
+  if(filterBy === 'no') list = list.filter(r=> r.recommend === 'no');
+
+  // Sort
+  if(sortBy === 'newest'){
+    list.sort((a,b)=> b.createdAt - a.createdAt);
+  } else if(sortBy === 'highest'){
+    list.sort((a,b)=> b.rating - a.rating || b.createdAt - a.createdAt);
+  }
+
+  if(list.length === 0){
+    emptyMsg.style.display = 'block';
+  } else {
+    emptyMsg.style.display = 'none';
+  }
+
+  // Create DOM for each review
+  for(const r of list){
+    const node = document.createElement('article');
+    node.className = 'review';
+    node.setAttribute('data-id', r.id);
+
+    // avatar (initials)
+    const avatar = document.createElement('div');
+    avatar.className = 'avatar';
+    const initials = (r.name || 'U').split(' ').map(s=>s[0]||'').slice(0,2).join('').toUpperCase();
+    avatar.textContent = initials;
+
+    // body
+    const body = document.createElement('div');
+    body.className = 'rbody';
+
+    const rhead = document.createElement('div');
+    rhead.className = 'rhead';
+
+    const left = document.createElement('div');
+    left.style.flex = '1';
+
+    const title = document.createElement('div');
+    title.className = 'rtitle';
+    title.textContent = r.title;
+
+    const meta = document.createElement('div');
+    meta.className = 'rmeta';
+    meta.textContent = `${r.name} • ${formatDate(r.createdAt)} • ${r.rating} ★`;
+
+    left.appendChild(title);
+    left.appendChild(meta);
+
+    const right = document.createElement('div');
+    right.style.display = 'flex';
+    right.style.flexDirection = 'column';
+    right.style.alignItems = 'flex-end';
+    right.style.gap = '6px';
+
+    const badge = document.createElement('div');
+    badge.className = 'badge';
+    badge.textContent = r.recommend === 'yes' ? 'Recommended' : (r.recommend === 'no' ? 'Not recommended' : 'No answer');
+
+    right.appendChild(badge);
+
+    rhead.appendChild(left);
+    rhead.appendChild(right);
+
+    const desc = document.createElement('div');
+    desc.className = 'rdesc';
+    desc.textContent = r.description;
+
+    const rfoot = document.createElement('div');
+    rfoot.className = 'rfoot';
+
+    const helpful = document.createElement('div');
+    helpful.className = 'helpful';
+    const helpBtn = document.createElement('button');
+    helpBtn.type = 'button';
+    helpBtn.textContent = `Helpful (${r.helpfulCount})`;
+    helpBtn.setAttribute('aria-label', 'Mark review helpful');
+    helpBtn.addEventListener('click', function(){
+      incrementHelpful(r.id, helpBtn);
+    });
+
+    helpful.appendChild(helpBtn);
+
+    const metaRight = document.createElement('div');
+    metaRight.className = 'small';
+    metaRight.textContent = r.email ? r.email : 'Anonymous email';
+
+    rfoot.appendChild(helpful);
+    rfoot.appendChild(metaRight);
+
+    body.appendChild(rhead);
+    body.appendChild(desc);
+    body.appendChild(rfoot);
+
+    node.appendChild(avatar);
+    node.appendChild(body);
+
+    reviewsList.appendChild(node);
+  }
+}
+
+// Increment helpful count for a review
+function incrementHelpful(reviewId, buttonEl){
+  const idx = reviews.findIndex(r => r.id === reviewId);
+  if(idx === -1) return;
+  reviews[idx].helpfulCount++;
+  // update button text referencing new count
+  buttonEl.textContent = `Helpful (${reviews[idx].helpfulCount})`;
+}
+
+// Update the whole UI (stats + reviews)
+function updateUI(){
+  renderStats();
+  renderReviews();
+}
+
+// Form submit handler
+form.addEventListener('submit', function(e){
+  e.preventDefault();
+  clearErrors();
+
+  const name = nameInput.value || '';
+  const email = emailInput.value || '';
+  const title = titleInput.value || '';
+  const description = descInput.value || '';
+  const recommendRadios = document.querySelector('input[name="recommend"]:checked');
+  const recommend = recommendRadios ? recommendRadios.value : 'none';
+
+  // validate with reusable validators
+  let hasError = false;
+
+  const nameMsg = validateName(name);
+  if(nameMsg){ nameError.textContent = nameMsg; hasError = true; }
+
+  const emailMsg = validateEmail(email);
+  if(emailMsg){ emailError.textContent = emailMsg; hasError = true; }
+
+  const titleMsg = validateTitle(title);
+  if(titleMsg){ titleError.textContent = titleMsg; hasError = true; }
+
+  const descMsg = validateDescription(description);
+  if(descMsg){ descError.textContent = descMsg; hasError = true; }
+
+  const ratingMsg = validateRating(selectedRating);
+  if(ratingMsg){ ratingError.textContent = ratingMsg; hasError = true; }
+
+  if(hasError) return;
+
+  // Build review data and add
+  addReview({
+    name, email, title, description, rating: selectedRating, recommend
+  });
+
+  // Reset form to initial state
+  form.reset();
+  selectedRating = 0;
+  setRating(0);
+  descCounter.textContent = `0 / ${DESC_MAX}`;
+
+  // Focus name input for next review
+  nameInput.focus();
+});
+
+// Reset button
+resetBtn.addEventListener('click', function(){
+  form.reset();
+  selectedRating = 0;
+  setRating(0);
+  clearErrors();
+  descCounter.textContent = `0 / ${DESC_MAX}`;
+  nameInput.focus();
+});
+
+// Update UI when sorting or filtering changes
+sortSelect.addEventListener('change', updateUI);
+filterRecommend.addEventListener('change', updateUI);
+
+// initial render
+updateUI();
+
+/* Edge cases & helpers:
+   - No server: all stored in reviews[] for this session.
+   - Handles optional email, optional recommend.
+   - Helpful counts stored per review object.
+   - Sorting and filtering are applied client-side.
+*/
+
+// Accessibility: allow keyboard for star rating
+ratingGroup.addEventListener('keydown', function(e){
+  const key = e.key;
+  if(!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Enter',' '].includes(key)) return;
+  e.preventDefault();
+  if(key === 'ArrowLeft' || key === 'ArrowDown'){
+    if(selectedRating > 1) setRating(selectedRating - 1);
+  } else if(key === 'ArrowRight' || key === 'ArrowUp'){
+    if(selectedRating < 5) setRating(selectedRating + 1);
+  } else if(key === 'Enter' || key === ' '){
+    if(selectedRating === 0) setRating(5); // fallback: set to max if none
+  }
+});
+</script>
+</body>
+</html>
