@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Event Registration - Global Tech Connect</title>
+
+    <h2>Event Registration</h2>
+    <br><br>
+
+<label>Full Name</label>
+<input type="text" id="fullName">
+<div id="nameError" class="error"></div>
+
+<br><br>
+
+<label>Professional Email</label> 
+<input type="email" id="email">
+<div id="emailError" class="error"></div>
+
+<br><br>
+
+<label>Company / Institution (Optional)</label>
+<input type="text" id="company">
+
+<br><br>
+
+<label>Attendance Type</label>
+<input type="radio" name="attend" value="Virtual"> Virtual
+<input type="radio" name="attend" value="In-Person" style="margin-left:10px;"> In-Person
+<div id="attendError" class="error"></div>
+
+<br><br> 
+
+<button id="submitBtn" onclick="registerUser()">Register</button>
+<button id="toggleBtn" onclick="toggleAnalytics()">Show Event Analytics</button>
+<div id="analyticsPanel">
+    <h3>Event Analytics</h3>
+    <p>Total Registrants: <span id="totalCount">0</span></p>
+    <p>Virtual: <span id="virtualCount">0</span></p>
+    <p>In-Person: <span id="inCount">0</span></p>
+</div>
+
+
+
+    </head>
+</html>
