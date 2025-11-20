@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login</title>
+ 
+    <script>
+        function handleLogin() {
+ 
+            const user = document.getElementById("username").value;
+            const pass = document.getElementById("password").value;
+ 
+            // Validate Username
+            if (!user || user == "") {
+                document.getElementById("userErr").innerHTML = "User Name is required";
+            } else {
+                document.getElementById("userErr").innerHTML = "";
+            }
+ 
+            // Validate Password
+            if (!pass || pass == "") {
+                document.getElementById("passErr").innerHTML = "Password is required";
+            } else {
+                document.getElementById("passErr").innerHTML = "";
+            }
+ 
+            // Stop form submission if errors exist
+            if (user == "" || pass == "") {
+                return false;
+            }
+ 
+            return true;
+        }
+    </script>
+ 
+</head>
+<body>
+ 
+<h3>C. LOGIN</h3>
+ 
+<table width="100%" border="1">
+    <tr>
+        <td>
+            <!-- Header -->
+            <table width="100%">
+                <tr>
+                    <td>
+                        <img src="logo.png" height="60">
+                        <b style="font-size: 25px;">Company</b>
+                    </td>
+ 
+                    <td align="right">
+                        <a href="home.html">Home</a> |
+                        <a href="login.html">Login</a> |
+                        <a href="registration.html">Registration</a>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+ 
+ 
+    <!-- Login Box -->
+    <tr>
+        <td height="300" align="center">
+            <fieldset style="width:300px;">
+                <legend><b>LOGIN</b></legend>
+ 
+                <form onsubmit="return handleLogin()">
+ 
+                    User Name :
+                    <input type="text" id="username"><br>
+                    <p id="userErr" style="color:red;"></p>
+ 
+                    Password :
+                    <input type="password" id="password"><br>
+                    <p id="passErr" style="color:red;"></p>
+ 
+                    <input type="checkbox"> Remember Me <br><br>
+ 
+                    <input type="submit" value="Submit">
+                    <a href="forgot.html">Forgot Password?</a>
+ 
+                </form>
+            </fieldset>
+        </td>
+    </tr>
+ 
+    <!-- Footer -->
+    <tr>
+        <td align="center">
+            Copyright © 2017
+        </td>
+    </tr>
+ 
+</table>
+ 
+</body>
+</html>
