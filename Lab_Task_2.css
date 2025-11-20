@@ -1,0 +1,90 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    background-color: #f0f0f0;
+}
+
+.dashboard-container {
+    width: 800px;
+    margin: 0 auto;
+    border: 1px solid #000;
+    background-color: #fff;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    border-bottom: 1px solid #000;
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: bold;
+    color: #28a745;
+}
+.logo::before {
+    content: 'X';
+}
+
+.user-info {
+    font-size: 14px;
+}
+.user-info a {
+    color: #6a0dad;
+    text-decoration: underline;
+}
+
+.main-content {
+    display: flex;
+    min-height: 300px;
+}
+
+.sidebar {
+    width: 200px;
+    padding: 20px;
+    border-right: 1px solid #000;
+    background-color: #f9f9f9;
+}
+
+.sidebar h3 {
+    margin-top: 0;
+    font-size: 16px;
+    border-bottom: 1px solid #aaa;
+    padding-bottom: 5px;
+}
+
+.sidebar ul {
+    list-style-type: disc;
+    padding-left: 20px;
+    margin: 0;
+}
+
+.sidebar ul li {
+    margin-bottom: 5px;
+}
+
+.sidebar ul li a {
+    color: #6a0dad;
+    text-decoration: underline;
+}
+
+.dashboard-view {
+    flex-grow: 1;
+    padding: 20px;
+}
+
+.dashboard-view h3 {
+    margin-top: 0;
+    font-size: 16px;
+}
+
+.footer {
+    padding: 10px 20px;
+    text-align: center;
+    font-size: 13px;
+    border-top: 1px solid #000;
+    background-color: #f0f0f0;
+}
