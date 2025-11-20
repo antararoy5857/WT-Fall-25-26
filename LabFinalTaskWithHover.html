@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Event Registration</title>
+
+    <style>
+        body{font-family: Arial; background:#f2f2f2;}
+        .box{
+            width:420px; 
+            background:white; 
+            padding:20px; 
+            margin:auto; 
+            margin-top:40px; 
+            border:1px solid #ccc;
+        }
+        .error{color:red; font-size:14px;}
+        #statsPanel{
+            width:420px;
+            margin:auto;
+            margin-top:20px;
+            background:white;
+            padding:15px;
+            border:1px solid #ccc;
+            display:none;
+        }
+    </style> 
+    <br><br> 
+
+    <script>
+
+        let allRegs = [];
+        let virtualCount = 0;
+        let inPersonCount = 0;
+
+        function regNow() {
+
+            let fullName = document.getElementById("fullName").value.trim();
+            let email = document.getElementById("email").value.trim();
+            let company = document.getElementById("company").value.trim();
+            let attendType = document.querySelector("input[name='attend']:checked");
+
+            let nameErr = document.getElementById("nameErr");
+            let emailErr = document.getElementById("emailErr");
+            let attendErr = document.getElementById("attendErr");
+
+            nameErr.innerHTML = "";
+            emailErr.innerHTML = "";
+            attendErr.innerHTML = "";
+
+            let ok = true;
+
+            
+            if(fullName.length < 6 || fullName.length > 100){
+                nameErr.innerHTML = "Name must be between 6 and 100 characters.";
+                ok = false;
+            }
+
+            
+            if(email == "" || email.indexOf("@") == -1 || email.indexOf(".") == -1){
+                emailErr.innerHTML = "Please enter a valid professional email address.";
+                ok = false;
+            }
+
+            if(attendType == null){
+                attendErr.innerHTML = "Please select your attendance type.";
+                ok = false;
+            }
+
+            if(ok == false){
+                return false;
+            }
+
+          
+            allRegs.push({
+                name: fullName,
+                mail: email,
+                comp: company,
+                type: attendType.value
+            });
+
+            if(attendType.value == "Virtual"){
+                virtualCount++;
+            } else {
+                inPersonCount++;
+            }
+
+            alert("Registration Successful!");
+            return false;
+        }
+
+        function showStats(){
+            let p = document.getElementById("statsPanel");
+            let btn = document.getElementById("statBtn");
+
+            if(p.style.display == "none"){
+                p.style.display = "block";
+                btn.value = "Hide Event Analytics";
+                document.getElementById("totalR").innerHTML = allRegs.length;
+                document.getElementById("vR").innerHTML = virtualCount;
+                document.getElementById("iR").innerHTML = inPersonCount;
+            } else{
+                p.style.display = "none";
+                btn.value = "Show Event Analytics";
+            }
+        }
+    </script>
+</head>
+
+<body>
+
+    <div class="box">
+        <h2>Event Registration</h2>
+        <br><br> 
+
+        <form onsubmit="return regNow()">
+
+            Full Name:<br><br> 
+            <input type="text" id="fullName" style="width:100%;">
+            <br>
+            <span class="error" id="nameErr"></span>
+            <br>
+
+            Professional Email:<br><br>
+            <input type="text" id="email" style="width:100%;">
+            <br>
+            <span class="error" id="emailErr"></span>
+            <br>
+
+            Company / Institution (Optional):<br><br> 
+            <input type="text" id="company" style="width:100%;">
+            <br><br><br> 
+
+            Attendance Type:<br><br><br> 
+            <input type="radio" name="attend" value="Virtual"> Virtual
+            <input type="radio" name="attend" value="In-Person"> In-Person
+            <br><br>
+            <span class="error" id="attendErr"></span>
+            <br><br>
+
+            <input type="submit" value="Register" style="padding:6px 15px;">
+        </form>
+
+        <br><br>
+        <input type="button" id="statBtn" value="Show Event Analytics" onclick="showStats()" style="padding:6px 15px;">
+    </div>
+
+    <div id="statsPanel">
+        <h3>Event Analytics</h3>
+        Total Registrants: <b id="totalR">0</b><br>
+        Virtual Attendees: <b id="vR">0</b><br>
+        In-Person Attendees: <b id="iR">0</b><br>
+    </div>
+
+</body>
+</html>
